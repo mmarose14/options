@@ -18,6 +18,7 @@ def getAPIData(url):
     headers={'Authorization': bearer_token, 'Accept': 'application/json'}
 
     response = requests.get(url, headers=headers)
+    #print(response.headers['X-Ratelimit-Available'])   #Use this to determine if being rate-limited
     if response.status_code == 200:
         return json.loads(response.content.decode('utf-8'))
 
