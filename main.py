@@ -5,8 +5,11 @@ import api
 #Get list of symbols from text file
 listOfSymbols = files.getListOfSymbols()
 
-#Gather data and process it
-options_data = options.processSymbols(listOfSymbols)
+#Choose strategy
+#options_data = options.findDeltaHedges(listOfSymbols)
+#options_data = options.scanForCheapOptions(listOfSymbols)
+#options_data = options.findPutSpreads(listOfSymbols)
+options_data = options.findCoveredCalls(listOfSymbols)
 
 #Export option data into a file
 files.exportToFile(options_data, api.isSandbox)

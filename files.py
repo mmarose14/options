@@ -37,5 +37,4 @@ def exportToFile(expirations,sandbox):
     output_file = open(filename, "w+")
 
     for line in expirations:
-        #if ("X" in line or "Symbol" in line):
             output_file.writelines(f"{line}\n")

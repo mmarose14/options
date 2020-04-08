@@ -31,11 +31,13 @@ def getLastStockPrice(symbol):
 def getOptionExpirations(symbol):
     url = f"https://{ENV}.tradier.com/v1/markets/options/expirations?symbol={symbol}"
     expirations_data = getAPIData(url)
-    return expirations_data
+    expirations = expirations_data['expirations']['date']
+    return expirations
 
 def getOptionsChain(symbol, expiration):
     #Endpoint for options chain
     url = f"https://{ENV}.tradier.com/v1/markets/options/chains?symbol={symbol}&expiration={expiration}&greeks=true"
-    options_chain = getAPIData(url)
-    return options_chain
+    options_chain_data = getAPIData(url)
+    options_chain_list = options_chain_data['options']['option']
+    return options_chain_list
 
