@@ -2,14 +2,12 @@ import os
 
 TEST_ONLY = False   #Only used for list of test symbols (symbols-test.txt)
 
-def getListOfSymbols():
+def getListOfSymbols(filename):
     #Current directory
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     if (TEST_ONLY):
         filename = "symbols-test.txt"
-    else:
-        filename = "symbols.txt"
 
     #Read ticker symbols file - default file contains options with high IV
     symbols = open(filename,"r")
@@ -25,16 +23,13 @@ def getListOfSymbols():
 
     #Remove symbols from ignore list
     ListOfSymbols = [item for item in ListOfSymbols if item not in IgnoreList]
-    
+
     return ListOfSymbols
 
-def exportToFile(expirations,sandbox):
-    if (sandbox):
-        filename = "output.txt"
-    else:
-        filename = "output-prod.txt"
-
+def exportToFile(expirations,filename,sandbox):
     output_file = open(filename, "w+")
 
     for line in expirations:
-            output_file.writelines(f"{line}\n")
+        if ("<" in line or "Symbol" in line):
+            str_output = line + "\n"
+            output_file.write(str_output)
