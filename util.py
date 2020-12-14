@@ -43,6 +43,9 @@ def listOfLimitedExpirations(symbol, min_dte, max_dte):
 
     expirations = []
 
+    if(isinstance(expirations_list, str)):
+        return []
+
     for expiration_date in expirations_list:
         #Extract dates within set DTE
         date_object = datetime.strptime(expiration_date,"%Y-%m-%d")
