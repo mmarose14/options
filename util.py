@@ -1,12 +1,10 @@
 import api
 from datetime import datetime, timedelta
 
-MIN_DTE = 20                        #Minimum DTE
-MAX_DTE = 50                        #Maximum DTE
-
 def gatherOptionData(option):
     option_data = {}
 
+    option_data['symbol'] = option['underlying']
     option_data['type'] = option['option_type']
     option_data['expiration'] = option['expiration_date']
     option_data['strike'] = option['strike']
@@ -61,3 +59,47 @@ def listOfLimitedExpirations(symbol, min_dte, max_dte):
         expirations.append(expiration_date)
 
     return expirations
+
+def getTimeStamp():
+    date_object = datetime.now()
+
+    date_str = datetime.strftime(date_object, "%Y-%m-%d %H:%M:%S")
+    return date_str
+
+def optionOutput(option):
+    delta = -999
+    if ('delta' in option):
+        delta = option['delta']
+
+    #Estimated premium (mid price)
+    premium = round((option['bid'] + option['ask']) / 2,2)
+
+    option_output = '{}, {}, BID:{}, ASK:{}, {}, {}(D), Premium: {}'\
+        .format(
+            option['expiration'],
+            option['strike'],
+            option['bid'],
+            option['ask'],
+            option['volume'],
+            delta,
+            premium)
+    
+    return option_output
+
+def shortCallOptionOutput(option):
+    delta = -999
+    if ('delta' in option):
+        delta = option['delta']
+
+    #Estimated premium (mid price)
+    premium = round((option['bid'] + option['ask']) / 2,2)
+
+    option_output = '{}, {} {}, {}(D), Premium: {}'\
+        .format(
+            option['expiration'],
+            option['strike'],
+            option['volume'],
+            delta,
+            premium)
+    
+    return option_output

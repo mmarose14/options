@@ -1,8 +1,17 @@
-import files
+import config
 import api
 import util
 import panda_files
-from datetime import datetime, timedelta
+from datetime import datetime
+
+def main():
+
+    filename_in = "stocks-screener-winners.csv"
+
+    #Get symbols from file
+    listOfSymbols = panda_files.importCSV(filename_in)
+
+    findPutSpreads(listOfSymbols)
 
 def findPutSpreads(ListOfSymbols):
 
@@ -10,22 +19,19 @@ def findPutSpreads(ListOfSymbols):
     MIN_VOLUME = 1          
     MAX_BID_ASK_SPREAD = .15
     MAX_STRIKES_WIDTH = 5   
-    MAX_DELTA = -.2         
-    MIN_PREMIUM = .21
+    DELTA = -.2         
+    MIN_PREMIUM = .29
 
-    matching_options = []
     data_frame = []
 
     for symbol in ListOfSymbols:
         print(f"Processing {symbol}...")
 
         expirations_list = util.listOfLimitedExpirations(symbol,21,47)
+        #Try hard-coded expirations for faster processing
+        #expirations_list = ["2021-02-19"]
 
-        numOptions = 0
         for expiration in expirations_list:
-            #This is temporary... add actual dates later
-            if (expiration == "2020-12-08"):
-                continue
 
             options = api.getOptionsChain(symbol, expiration)
 
@@ -47,6 +53,7 @@ def findPutSpreads(ListOfSymbols):
                 #Figure out net credit from credit spread
                 net_credit = round ((premium - prev_option_prem),2)
 
+
                 if ('delta' in option):
                     delta = option['delta']
                     delta = round(delta, 2)
@@ -55,7 +62,7 @@ def findPutSpreads(ListOfSymbols):
                 if (option['type'] == "put"
                     and option['bid'] > 0.0
                     and premium >= MIN_PREMIUM
-                    and delta >= MAX_DELTA
+                    and delta >= DELTA
                     and (option['ask'] - option['bid']) <= MAX_BID_ASK_SPREAD
                     and option['volume'] > MIN_VOLUME
                     ):
@@ -69,10 +76,6 @@ def findPutSpreads(ListOfSymbols):
                             option['volume'],
                             delta,
                             premium)
-
-                    if (numOptions == 0):
-                        matching_options.append(f"Symbol: {symbol}")
-                        numOptions += 1
 
                     #Mark a strike where the width between the current strike and the previous strike meets the criteria
                     if (net_credit >= MIN_PREMIUM
@@ -91,20 +94,23 @@ def findPutSpreads(ListOfSymbols):
                                         option['volume'],
                                         delta,
                                         premium,
-                                        net_credit])
+                                        net_credit,
+                                        util.getTimeStamp()])
 
 
-                    #Print the screen when a match is found
-                    print(f"Found: {option_output} - ({datetime.now()})")
+                        #Print the screen when a match is found
+                        print(f"Found: {option_output} - ({util.getTimeStamp()})")
 
-                    #matching_options.append(option_output)
 
                 if (option['type'] == "put"):
                     prev_option_prem = premium
                     prev_option_strike = option['strike']
 
     panda_files.exportToFile(data_frame, "output_spreads.csv")
+    if (config.REMOTE):
+        panda_files.exportToWeb(data_frame, "output_spreads")
+        panda_files.exportToJson(data_frame, "output_spreads")
 
-    #print(data_frame)
-    return matching_options
+if __name__ == '__main__':
+    main()
 

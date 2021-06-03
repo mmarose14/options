@@ -10,7 +10,7 @@ import time
 ENV = "sandbox"
 #ENV = "api"
 
-RATE_LIMIT = 170
+RATE_LIMIT = 100
 
 def isSandbox(): return (ENV == "sandbox")
 
@@ -22,8 +22,8 @@ def getAPIData(url):
     rate_avail_str = response.headers['X-Ratelimit-Available']
     rate_avail = int(rate_avail_str)
     if (rate_avail <= RATE_LIMIT):
-        time.sleep(3)
-    print(rate_avail)   #Use this to determine if being rate-limited
+        time.sleep(10)
+    #print(rate_avail)   #Use this to determine if being rate-limited
     if response.status_code == 200:
         return json.loads(response.content.decode('utf-8'))
 
@@ -50,6 +50,9 @@ def getOptionsChain(symbol, expiration):
     #Endpoint for options chain
     url = f"https://{ENV}.tradier.com/v1/markets/options/chains?symbol={symbol}&expiration={expiration}&greeks=true"
     options_chain_data = getAPIData(url)
-    options_chain_list = options_chain_data['options']['option']
-    return options_chain_list
+    options_chain = []
+    if (options_chain_data['options']):
+        options_chain = options_chain_data['options']['option']
+        
+    return options_chain
 

@@ -1,1 +1,3 @@
-API_TOKEN = "Your Token Here"
+API_TOKEN = ""
+STRATEGY = ""
+REMOTE=0
